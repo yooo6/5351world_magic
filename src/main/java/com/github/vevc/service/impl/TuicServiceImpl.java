@@ -105,6 +105,7 @@ public class TuicServiceImpl extends AbstractAppService {
                 int exitCode = this.startProcess(pb);
                 if (exitCode == 0) {
                     LogUtil.info("Tuic server process exited with code: " + exitCode);
+                    break;
                 } else {
                     LogUtil.info("Tuic server process exited with code: " + exitCode + ", restarting...");
                     TimeUnit.SECONDS.sleep(3);
