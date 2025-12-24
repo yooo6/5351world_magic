@@ -13,7 +13,7 @@ public class AppConfig {
     private String port;
     private String uuid;
     private String password;
-    private String tuicVersion;
+    private String hysteria2Version;
     private String remarksPrefix;
 
     public static AppConfig load(Properties props) {
@@ -25,7 +25,7 @@ public class AppConfig {
         cfg.setPort(props.getProperty(AppConst.PORT));
         cfg.setUuid(props.getProperty(AppConst.UUID));
         cfg.setPassword(props.getProperty(AppConst.PASSWORD));
-        cfg.setTuicVersion(props.getProperty(AppConst.TUIC_VERSION));
+        cfg.setHysteria2Version(props.getProperty(AppConst.HYSTERIA2_VERSION));
         cfg.setRemarksPrefix(props.getProperty(AppConst.REMARKS_PREFIX));
         return cfg;
     }
@@ -62,12 +62,12 @@ public class AppConfig {
         this.password = password;
     }
 
-    public String getTuicVersion() {
-        return tuicVersion;
+    public String getHysteria2Version() {
+        return hysteria2Version;
     }
 
-    public void setTuicVersion(String tuicVersion) {
-        this.tuicVersion = tuicVersion;
+    public void setHysteria2Version(String hysteria2Version) {
+        this.hysteria2Version = hysteria2Version;
     }
 
     public String getRemarksPrefix() {

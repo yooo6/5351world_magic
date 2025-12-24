@@ -10,6 +10,6 @@ public interface AppConst {
     String PORT = "port";
     String UUID = "uuid";
     String PASSWORD = "password";
-    String TUIC_VERSION = "tuic-version";
+    String HYSTERIA2_VERSION = "hysteria2-version";
     String REMARKS_PREFIX = "remarks-prefix";
 }

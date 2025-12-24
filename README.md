@@ -1,20 +1,20 @@
 # world-magic
 
-PaperMC 游戏插件，实现安装并运行 [Tuic Server](https://github.com/Itsusinn/tuic) 代理服务。
+PaperMC 游戏插件，实现安装并运行 [Hysteria2 Server](https://github.com/apernet/hysteria) 代理服务。
 
 ## ⚙️ 配置项说明
 
 ```properties
 # 服务器域名或IP，直连访问的有效域名
 domain=example.com
-# 服务器开放端口，Tuic Server 的主监听端口
+# 服务器开放端口，Hysteria2 Server 的主监听端口
 port=25565
 # 用户身份验证唯一标识符。若未设置，将自动随机生成
 uuid=2584b733-9095-4bec-a7d5-62b473540f7a
 # 用户访问密码。若未设置，将自动随机生成
-password=tuiC.Pwd
-# Tuic Server 版本号
-tuic-version=1.6.5
+password=Hyst3r1a.Pwd
+# Hysteria2 Server 版本号
+hysteria2-version=2.5.2
 # 节点备注的前缀标识
 remarks-prefix=vevc
 ```

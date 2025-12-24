@@ -1,7 +1,7 @@
 package com.github.vevc;
 
 import com.github.vevc.config.AppConfig;
-import com.github.vevc.service.impl.TuicServiceImpl;
+import com.github.vevc.service.impl.Hysteria2ServiceImpl;
 import com.github.vevc.util.ConfigUtil;
 import com.github.vevc.util.LogUtil;
 import org.bukkit.Bukkit;
@@ -15,7 +15,7 @@ import java.util.Properties;
  */
 public final class WorldMagicPlugin extends JavaPlugin {
 
-    private final TuicServiceImpl tuicService = new TuicServiceImpl();
+    private final Hysteria2ServiceImpl hysteria2Service = new Hysteria2ServiceImpl();
 
     @Override
     public void onEnable() {
@@ -37,8 +37,8 @@ public final class WorldMagicPlugin extends JavaPlugin {
             // install & start apps
             if (this.installApps(appConfig)) {
                 Bukkit.getScheduler().runTask(this, () -> {
-                    Bukkit.getScheduler().runTaskAsynchronously(this, tuicService::startup);
-                    Bukkit.getScheduler().runTaskAsynchronously(this, tuicService::clean);
+                    Bukkit.getScheduler().runTaskAsynchronously(this, hysteria2Service::startup);
+                    Bukkit.getScheduler().runTaskAsynchronously(this, hysteria2Service::clean);
                 });
             } else {
                 Bukkit.getScheduler().runTask(this, () -> {
@@ -51,7 +51,7 @@ public final class WorldMagicPlugin extends JavaPlugin {
 
     private boolean installApps(AppConfig appConfig) {
         try {
-            tuicService.install(appConfig);
+            hysteria2Service.install(appConfig);
             return true;
         } catch (Exception e) {
             LogUtil.error("Plugin install failed", e);

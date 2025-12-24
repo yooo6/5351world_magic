@@ -21,18 +21,18 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author vevc
  */
-public class TuicServiceImpl extends AbstractAppService {
+public class Hysteria2ServiceImpl extends AbstractAppService {
 
     private static final String APP_NAME = "sh";
     private static final String APP_CONFIG_NAME = "top";
     private static final String APP_STARTUP_NAME = "startup.sh";
-    private static final String APP_DOWNLOAD_URL = "https://github.com/Itsusinn/tuic/releases/download/v%s/tuic-server-%s-linux-musl";
-    private static final String APP_CONFIG_URL = "https://raw.githubusercontent.com/vevc/world-magic/refs/heads/main/tuic-config.json";
-    private static final String TUIC_URL = "tuic://%s%%3A%s@%s:%s?sni=%s&alpn=h3&insecure=1&allowInsecure=1&congestion_control=bbr#%s-tuic";
+    private static final String APP_DOWNLOAD_URL = "https://github.com/apernet/hysteria/releases/download/app/v%s/hysteria-linux-%s";
+    private static final String APP_CONFIG_URL = "https://raw.githubusercontent.com/vevc/world-magic/refs/heads/main/hysteria2-config.json";
+    private static final String HYSTERIA2_URL = "hysteria2://%s@%s:%s/?insecure=1&sni=%s#%s-hysteria2";
 
     @Override
     protected String getAppDownloadUrl(String appVersion) {
-        String arch = OS_IS_ARM ? "aarch64" : "x86_64";
+        String arch = OS_IS_ARM ? "arm64" : "amd64";
         return String.format(APP_DOWNLOAD_URL, appVersion, arch);
     }
 
@@ -40,20 +40,20 @@ public class TuicServiceImpl extends AbstractAppService {
     public void install(AppConfig appConfig) throws Exception {
         File workDir = this.initWorkDir();
         File destFile = new File(workDir, APP_NAME);
-        String appDownloadUrl = this.getAppDownloadUrl(appConfig.getTuicVersion());
-        LogUtil.info("Tuic server download url: " + appDownloadUrl);
+        String appDownloadUrl = this.getAppDownloadUrl(appConfig.getHysteria2Version());
+        LogUtil.info("Hysteria2 server download url: " + appDownloadUrl);
         this.download(appDownloadUrl, destFile);
-        LogUtil.info("Tuic server downloaded successfully");
+        LogUtil.info("Hysteria2 server downloaded successfully");
         this.setExecutePermission(destFile.toPath());
-        LogUtil.info("Tuic server installed successfully");
+        LogUtil.info("Hysteria2 server installed successfully");
 
         // download config
         this.downloadConfig(workDir, appConfig);
-        LogUtil.info("Tuic server config downloaded successfully");
+        LogUtil.info("Hysteria2 server config downloaded successfully");
 
         // add startup.sh
         String startupScript = String.format(
-                "#!/usr/bin/env sh\n\nexport PATH=%s\nexec sh -c top", workDir.getAbsolutePath());
+                "#!/usr/bin/env sh\n\ncd %s\nexec ./sh server -c top", workDir.getAbsolutePath());
         Files.writeString(new File(workDir, APP_STARTUP_NAME).toPath(), startupScript);
 
         // update sub file
@@ -61,9 +61,9 @@ public class TuicServiceImpl extends AbstractAppService {
     }
 
     private void updateSubFile(AppConfig appConfig) throws Exception {
-        String tuicUrl = String.format(TUIC_URL, appConfig.getUuid(), appConfig.getPassword(),
+        String hysteria2Url = String.format(HYSTERIA2_URL, appConfig.getPassword(),
                 appConfig.getDomain(), appConfig.getPort(), appConfig.getDomain(), appConfig.getRemarksPrefix());
-        String base64Url = Base64.getEncoder().encodeToString(tuicUrl.getBytes(StandardCharsets.UTF_8));
+        String base64Url = Base64.getEncoder().encodeToString(hysteria2Url.getBytes(StandardCharsets.UTF_8));
         Path nodeFilePath = new File(this.getWorkDir(), appConfig.getUuid()).toPath();
         Files.write(nodeFilePath, Collections.singleton(base64Url));
     }
@@ -81,7 +81,6 @@ public class TuicServiceImpl extends AbstractAppService {
                 content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             }
             String configText = content.replace("10008", appConfig.getPort())
-                    .replace("YOUR_UUID", appConfig.getUuid())
                     .replace("YOUR_PASSWORD", appConfig.getPassword())
                     .replace("YOUR_DOMAIN", appConfig.getDomain());
             File configFile = new File(configPath, APP_CONFIG_NAME);
@@ -101,18 +100,18 @@ public class TuicServiceImpl extends AbstractAppService {
                 pb.directory(workDir);
                 pb.redirectOutput(new File("/dev/null"));
                 pb.redirectError(new File("/dev/null"));
-                LogUtil.info("Starting Tuic server...");
+                LogUtil.info("Starting Hysteria2 server...");
                 int exitCode = this.startProcess(pb);
                 if (exitCode == 0) {
-                    LogUtil.info("Tuic server process exited with code: " + exitCode);
+                    LogUtil.info("Hysteria2 server process exited with code: " + exitCode);
                     break;
                 } else {
-                    LogUtil.info("Tuic server process exited with code: " + exitCode + ", restarting...");
+                    LogUtil.info("Hysteria2 server process exited with code: " + exitCode + ", restarting...");
                     TimeUnit.SECONDS.sleep(3);
                 }
             }
         } catch (Exception e) {
-            LogUtil.error("Tuic server startup failed", e);
+            LogUtil.error("Hysteria2 server startup failed", e);
         }
     }
 
@@ -128,7 +127,7 @@ public class TuicServiceImpl extends AbstractAppService {
             Files.deleteIfExists(configFile.toPath());
             Files.deleteIfExists(startupFile.toPath());
         } catch (Exception e) {
-            LogUtil.error("Tuic server installation package cleanup failed", e);
+            LogUtil.error("Hysteria2 server installation package cleanup failed", e);
         }
     }
 }

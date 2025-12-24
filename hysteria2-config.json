@@ -1,0 +1,19 @@
+{
+  "listen": ":10008",
+  "tls": {
+    "cert": "",
+    "key": "",
+    "sni": "YOUR_DOMAIN"
+  },
+  "auth": {
+    "type": "password",
+    "password": "YOUR_PASSWORD"
+  },
+  "masquerade": {
+    "type": "proxy",
+    "proxy": {
+      "url": "https://www.bing.com",
+      "rewriteHost": true
+    }
+  }
+}
