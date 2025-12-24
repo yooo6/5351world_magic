@@ -11,6 +11,7 @@ public class AppConfig {
 
     private String domain;
     private String port;
+    private String hysteria2Port;
     private String uuid;
     private String password;
     private String hysteria2Version;
@@ -23,6 +24,7 @@ public class AppConfig {
         AppConfig cfg = new AppConfig();
         cfg.setDomain(props.getProperty(AppConst.DOMAIN));
         cfg.setPort(props.getProperty(AppConst.PORT));
+        cfg.setHysteria2Port(props.getProperty(AppConst.HYSTERIA2_PORT));
         cfg.setUuid(props.getProperty(AppConst.UUID));
         cfg.setPassword(props.getProperty(AppConst.PASSWORD));
         cfg.setHysteria2Version(props.getProperty(AppConst.HYSTERIA2_VERSION));
@@ -44,6 +46,14 @@ public class AppConfig {
 
     public void setPort(String port) {
         this.port = port;
+    }
+
+    public String getHysteria2Port() {
+        return hysteria2Port;
+    }
+
+    public void setHysteria2Port(String hysteria2Port) {
+        this.hysteria2Port = hysteria2Port;
     }
 
     public String getUuid() {
