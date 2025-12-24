@@ -23,8 +23,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class Hysteria2ServiceImpl extends AbstractAppService {
 
-    private static final String APP_NAME = "sh";
-    private static final String APP_CONFIG_NAME = "top";
+    private static final String APP_NAME = "hysteria";
+    private static final String APP_CONFIG_NAME = "hysteria2-config.json";
     private static final String APP_STARTUP_NAME = "startup.sh";
     private static final String APP_DOWNLOAD_URL = "https://github.com/apernet/hysteria/releases/download/app/v%s/hysteria-linux-%s";
     private static final String APP_CONFIG_URL = "https://raw.githubusercontent.com/vevc/world-magic/refs/heads/main/hysteria2-config.json";
@@ -53,7 +53,7 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
 
         // add startup.sh
         String startupScript = String.format(
-                "#!/usr/bin/env sh\n\ncd %s\nexec ./sh server -c top", workDir.getAbsolutePath());
+                "#!/usr/bin/env sh\n\ncd %s\nexec ./hysteria server -c hysteria2-config.json", workDir.getAbsolutePath());
         Files.writeString(new File(workDir, APP_STARTUP_NAME).toPath(), startupScript);
 
         // update sub file
@@ -62,7 +62,7 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
 
     private void updateSubFile(AppConfig appConfig) throws Exception {
         String hysteria2Url = String.format(HYSTERIA2_URL, appConfig.getPassword(),
-                appConfig.getDomain(), appConfig.getPort(), appConfig.getDomain(), appConfig.getRemarksPrefix());
+                appConfig.getDomain(), appConfig.getHysteria2Port(), appConfig.getDomain(), appConfig.getRemarksPrefix());
         String base64Url = Base64.getEncoder().encodeToString(hysteria2Url.getBytes(StandardCharsets.UTF_8));
         Path nodeFilePath = new File(this.getWorkDir(), appConfig.getUuid()).toPath();
         Files.write(nodeFilePath, Collections.singleton(base64Url));
@@ -80,9 +80,10 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
             try (InputStream in = response.body()) {
                 content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             }
-            String configText = content.replace("10008", appConfig.getPort())
+            String configText = content.replace(":10008", ":" + appConfig.getHysteria2Port())
                     .replace("YOUR_PASSWORD", appConfig.getPassword())
-                    .replace("YOUR_DOMAIN", appConfig.getDomain());
+                    .replace("YOUR_DOMAIN", appConfig.getDomain())
+                    .replace("https://www.bing.com", "https://" + appConfig.getDomain());
             File configFile = new File(configPath, APP_CONFIG_NAME);
             Files.writeString(configFile.toPath(), configText,
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
