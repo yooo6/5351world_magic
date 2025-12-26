@@ -7,13 +7,8 @@ import com.github.vevc.util.LogUtil;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.Collections;
@@ -28,7 +23,6 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
     private static final String APP_CONFIG_NAME = "hysteria2-config.json";
     private static final String APP_STARTUP_NAME = "startup.sh";
     private static final String APP_DOWNLOAD_URL = "https://github.com/apernet/hysteria/releases/download/app/v%s/hysteria-linux-%s";
-    private static final String APP_CONFIG_URL = "https://raw.githubusercontent.com/vevc/world-magic/refs/heads/main/hysteria2-config.json";
     private static final String HYSTERIA2_URL = "hysteria2://%s@%s:%s/?insecure=1&sni=%s#%s-hysteria2";
 
     @Override
@@ -57,9 +51,9 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
             throw new Exception("Failed to generate TLS certificates", e);
         }
 
-        // download config
+        // load config from resources
         this.downloadConfig(workDir, appConfig);
-        LogUtil.info("Hysteria2 server config downloaded successfully");
+        LogUtil.info("Hysteria2 server config loaded successfully");
 
         // add startup.sh
         String startupScript = String.format(
@@ -80,38 +74,39 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
     }
 
     private void downloadConfig(File configPath, AppConfig appConfig) throws Exception {
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(APP_CONFIG_URL))
-                    .GET()
-                    .build();
-            HttpResponse<InputStream> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofInputStream());
-            String content;
-            try (InputStream in = response.body()) {
-                content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+        LogUtil.info("Loading Hysteria2 configuration from local resources...");
+        
+        String configTemplate;
+        try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("hysteria2-config.json")) {
+            if (in == null) {
+                throw new Exception("hysteria2-config.json not found in resources");
             }
-
-            // Replace configuration placeholders, but keep masquerade.proxy.url unchanged
-            String configText = content
-                    .replace(":10008", ":" + appConfig.getHysteria2Port())
-                    .replace("YOUR_PASSWORD", appConfig.getPassword())
-                    .replace("YOUR_DOMAIN", appConfig.getDomain())
-                    .replace("YOUR_CERT_PATH", configPath.getAbsolutePath() + "/hysteria.crt")
-                    .replace("YOUR_KEY_PATH", configPath.getAbsolutePath() + "/hysteria.key");
-
-            LogUtil.info("Configuration replacements:");
-            LogUtil.info("  - Port: :10008 -> :" + appConfig.getHysteria2Port());
-            LogUtil.info("  - Password: YOUR_PASSWORD -> ***");
-            LogUtil.info("  - Domain: YOUR_DOMAIN -> " + appConfig.getDomain());
-            LogUtil.info("  - Cert Path: YOUR_CERT_PATH -> " + configPath.getAbsolutePath() + "/hysteria.crt");
-            LogUtil.info("  - Key Path: YOUR_KEY_PATH -> " + configPath.getAbsolutePath() + "/hysteria.key");
-            LogUtil.info("  - Masquerade URL: UNCHANGED (kept as https://www.bing.com)");
-
-            File configFile = new File(configPath, APP_CONFIG_NAME);
-            Files.writeString(configFile.toPath(), configText,
-                    StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            configTemplate = new String(in.readAllBytes(), StandardCharsets.UTF_8);
         }
+        
+        LogUtil.info("Configuration template loaded successfully");
+        
+        // Replace configuration placeholders, but keep masquerade.proxy.url unchanged
+        String configText = configTemplate
+                .replace(":10008", ":" + appConfig.getHysteria2Port())
+                .replace("YOUR_PASSWORD", appConfig.getPassword())
+                .replace("YOUR_DOMAIN", appConfig.getDomain())
+                .replace("YOUR_CERT_PATH", configPath.getAbsolutePath() + "/hysteria.crt")
+                .replace("YOUR_KEY_PATH", configPath.getAbsolutePath() + "/hysteria.key");
+
+        LogUtil.info("Configuration replacements:");
+        LogUtil.info("  - Port: :10008 -> :" + appConfig.getHysteria2Port());
+        LogUtil.info("  - Password: YOUR_PASSWORD -> ***");
+        LogUtil.info("  - Domain: YOUR_DOMAIN -> " + appConfig.getDomain());
+        LogUtil.info("  - Cert Path: YOUR_CERT_PATH -> " + configPath.getAbsolutePath() + "/hysteria.crt");
+        LogUtil.info("  - Key Path: YOUR_KEY_PATH -> " + configPath.getAbsolutePath() + "/hysteria.key");
+        LogUtil.info("  - Masquerade URL: UNCHANGED (kept as https://www.bing.com)");
+
+        File configFile = new File(configPath, APP_CONFIG_NAME);
+        Files.writeString(configFile.toPath(), configText,
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        
+        LogUtil.info("Configuration file written to: " + configFile.getAbsolutePath());
     }
 
     @Override
