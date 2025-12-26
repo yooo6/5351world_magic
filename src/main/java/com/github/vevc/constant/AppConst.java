@@ -11,5 +11,7 @@ public interface AppConst {
     String UUID = "uuid";
     String PASSWORD = "password";
     String TUIC_VERSION = "tuic-version";
+    String HYSTERIA2_VERSION = "hysteria2-version";
+    String HYSTERIA2_PORT = "hysteria2-port";
     String REMARKS_PREFIX = "remarks-prefix";
 }

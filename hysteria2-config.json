@@ -1,0 +1,25 @@
+{
+  "listen": ":10008",
+  "tls": {
+    "cert": "YOUR_CERT_PATH",
+    "key": "YOUR_KEY_PATH",
+    "sni": "YOUR_DOMAIN"
+  },
+  "auth": {
+    "type": "password",
+    "password": "YOUR_PASSWORD"
+  },
+  "masquerade": {
+    "type": "proxy",
+    "proxy": {
+      "url": "https://www.bing.com",
+      "rewriteHost": true
+    }
+  },
+  "speed": {
+    "up": "100 mbps",
+    "down": "100 mbps"
+  },
+  "conn_idle_timeout": "300s",
+  "udp_idle_timeout": "60s"
+}
