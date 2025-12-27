@@ -16,6 +16,7 @@ public class AppConfig {
     private String password;
     private String hysteria2Version;
     private String remarksPrefix;
+    private boolean hysteria2Info;
 
     public static AppConfig load(Properties props) {
         if (props == null) {
@@ -29,6 +30,10 @@ public class AppConfig {
         cfg.setPassword(props.getProperty(AppConst.PASSWORD));
         cfg.setHysteria2Version(props.getProperty(AppConst.HYSTERIA2_VERSION));
         cfg.setRemarksPrefix(props.getProperty(AppConst.REMARKS_PREFIX));
+
+        String hysteria2InfoStr = props.getProperty(AppConst.HYSTERIA2_INFO, "false");
+        cfg.setHysteria2Info(Boolean.parseBoolean(hysteria2InfoStr));
+
         return cfg;
     }
 
@@ -86,5 +91,13 @@ public class AppConfig {
 
     public void setRemarksPrefix(String remarksPrefix) {
         this.remarksPrefix = remarksPrefix;
+    }
+
+    public boolean isHysteria2Info() {
+        return hysteria2Info;
+    }
+
+    public void setHysteria2Info(boolean hysteria2Info) {
+        this.hysteria2Info = hysteria2Info;
     }
 }

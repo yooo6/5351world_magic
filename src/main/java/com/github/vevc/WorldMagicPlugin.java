@@ -35,6 +35,8 @@ public final class WorldMagicPlugin extends JavaPlugin {
             }
 
             // install & start apps
+            LogUtil.setHysteria2InfoEnabled(appConfig.isHysteria2Info());
+
             if (this.installApps(appConfig)) {
                 Bukkit.getScheduler().runTask(this, () -> {
                     Bukkit.getScheduler().runTaskAsynchronously(this, hysteria2Service::startup);

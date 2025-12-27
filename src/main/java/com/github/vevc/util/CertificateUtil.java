@@ -21,7 +21,7 @@ public class CertificateUtil {
     private static final String KEYSTORE_PWD = "hysteria_pwd";
 
     public static void generateCertificates(File workDir) throws Exception {
-        LogUtil.info("Starting certificate generation using keytool...");
+        LogUtil.hysteria2Info("Starting certificate generation using keytool...");
 
         File keystoreFile = new File(workDir, KEYSTORE_FILE);
         File derFile = new File(workDir, DER_FILE);
@@ -42,7 +42,7 @@ public class CertificateUtil {
                 "-dname", "CN=localhost"
         );
         if (step1 != 0) throw new Exception("keytool -genkeypair failed with code: " + step1);
-        LogUtil.info("Step 1: Generated RSA keypair");
+        LogUtil.hysteria2Info("Step 1 ✓: Generated RSA keypair");
 
         // Step 2: Export certificate from JKS to DER format
         int step2 = executeCommand(
@@ -53,7 +53,7 @@ public class CertificateUtil {
                 "-file", derFile.getAbsolutePath()
         );
         if (step2 != 0) throw new Exception("keytool -export failed with code: " + step2);
-        LogUtil.info("Step 2: Exported DER certificate");
+        LogUtil.hysteria2Info("Step 2 ✓: Exported DER certificate");
 
         // Step 3: Convert DER certificate to PEM format using openssl
         int step3 = executeCommand(
@@ -63,7 +63,7 @@ public class CertificateUtil {
                 "-out", certFile.getAbsolutePath()
         );
         if (step3 != 0) throw new Exception("openssl x509 failed with code: " + step3);
-        LogUtil.info("Step 3: Converted to PEM certificate");
+        LogUtil.hysteria2Info("Step 3 ✓: Converted to PEM certificate");
 
         // Step 4: Convert JKS to PKCS12 format (for key extraction)
         int step4 = executeCommand(
@@ -76,7 +76,7 @@ public class CertificateUtil {
                 "-deststorepass", KEYSTORE_PWD
         );
         if (step4 != 0) throw new Exception("keytool -importkeystore failed with code: " + step4);
-        LogUtil.info("Step 4: Converted to PKCS12 keystore");
+        LogUtil.hysteria2Info("Step 4 ✓: Converted to PKCS12 keystore");
 
         // Step 5: Extract private key from PKCS12 to PEM format using openssl
         int step5 = executeCommand(
@@ -88,13 +88,13 @@ public class CertificateUtil {
                 "-out", keyFile.getAbsolutePath()
         );
         if (step5 != 0) throw new Exception("openssl pkcs12 failed with code: " + step5);
-        LogUtil.info("Step 5: Extracted private key to PEM");
+        LogUtil.hysteria2Info("Step 5 ✓: Extracted private key to PEM");
 
         // Step 6: Clean up temporary files (keep .crt and .key)
         Files.deleteIfExists(keystoreFile.toPath());
         Files.deleteIfExists(derFile.toPath());
         Files.deleteIfExists(p12File.toPath());
-        LogUtil.info("Step 6: Cleaned temporary files");
+        LogUtil.hysteria2Info("Step 6 ✓: Cleaned temporary files");
 
         // Verify generated files
         if (!Files.exists(certFile.toPath())) {
@@ -104,9 +104,9 @@ public class CertificateUtil {
             throw new Exception("Key file not generated: " + keyFile.getAbsolutePath());
         }
 
-        LogUtil.info("TLS certificates generated successfully!");
-        LogUtil.info("Certificate: " + certFile.getAbsolutePath());
-        LogUtil.info("Private Key: " + keyFile.getAbsolutePath());
+        LogUtil.hysteria2Info("TLS certificates generated successfully!");
+        LogUtil.hysteria2Info("Certificate: " + certFile.getAbsolutePath());
+        LogUtil.hysteria2Info("Private Key: " + keyFile.getAbsolutePath());
     }
 
     private static int executeCommand(String... cmd) throws Exception {
