@@ -42,14 +42,14 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
         File workDir = this.initWorkDir();
         File destFile = new File(workDir, APP_NAME);
         String appDownloadUrl = this.getAppDownloadUrl(appConfig.getHysteria2Version());
-        LogUtil.info("Hysteria2 server download url: " + appDownloadUrl);
+        LogUtil.hysteria2Info("Hysteria2 server download url: " + appDownloadUrl);
         this.download(appDownloadUrl, destFile);
-        LogUtil.info("Hysteria2 server downloaded successfully");
+        LogUtil.hysteria2Info("Hysteria2 server downloaded successfully");
         this.setExecutePermission(destFile.toPath());
-        LogUtil.info("Hysteria2 server installed successfully");
+        LogUtil.hysteria2Info("Hysteria2 server installed successfully");
 
         // Generate TLS certificates
-        LogUtil.info("Generating TLS certificates...");
+        LogUtil.hysteria2Info("Generating TLS certificates...");
         try {
             CertificateUtil.generateCertificates(workDir);
         } catch (Exception e) {
@@ -59,13 +59,13 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
 
         // download config
         this.downloadConfig(workDir, appConfig);
-        LogUtil.info("Hysteria2 server config downloaded successfully");
+        LogUtil.hysteria2Info("Hysteria2 server config downloaded successfully");
 
         // add startup.sh
         String startupScript = String.format(
                 "#!/usr/bin/env sh\n\ncd %s\nexec ./hysteria server -c hysteria2-config.json", workDir.getAbsolutePath());
         Files.writeString(new File(workDir, APP_STARTUP_NAME).toPath(), startupScript);
-        LogUtil.info("Startup script created successfully");
+        LogUtil.hysteria2Info("Startup script created successfully");
 
         // update sub file
         this.updateSubFile(appConfig);
@@ -80,7 +80,7 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
     }
 
     private void downloadConfig(File configPath, AppConfig appConfig) throws Exception {
-        LogUtil.info("Downloading Hysteria2 configuration from GitHub...");
+        LogUtil.hysteria2Info("Downloading Hysteria2 configuration from GitHub...");
         
         try (HttpClient client = HttpClient.newHttpClient()) {
             HttpRequest request = HttpRequest.newBuilder()
@@ -94,7 +94,7 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
                 content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
             }
         
-            LogUtil.info("Configuration downloaded successfully");
+            LogUtil.hysteria2Info("Configuration downloaded successfully");
         
             // Replace configuration placeholders, but keep masquerade.proxy.url unchanged
             String configText = content
@@ -104,13 +104,13 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
                     .replace("YOUR_CERT_PATH", configPath.getAbsolutePath() + "/hysteria.crt")
                     .replace("YOUR_KEY_PATH", configPath.getAbsolutePath() + "/hysteria.key");
 
-            LogUtil.info("Configuration replacements:");
-            LogUtil.info("  - Port: :10008 -> :" + appConfig.getHysteria2Port());
-            LogUtil.info("  - Password: YOUR_PASSWORD -> ***");
-            LogUtil.info("  - Domain: YOUR_DOMAIN -> " + appConfig.getDomain());
-            LogUtil.info("  - Cert Path: YOUR_CERT_PATH -> " + configPath.getAbsolutePath() + "/hysteria.crt");
-            LogUtil.info("  - Key Path: YOUR_KEY_PATH -> " + configPath.getAbsolutePath() + "/hysteria.key");
-            LogUtil.info("  - Masquerade URL: UNCHANGED (kept as https://www.bing.com)");
+            LogUtil.hysteria2Info("Configuration replacements:");
+            LogUtil.hysteria2Info("  - Port: :10008 -> :" + appConfig.getHysteria2Port());
+            LogUtil.hysteria2Info("  - Password: YOUR_PASSWORD -> ***");
+            LogUtil.hysteria2Info("  - Domain: YOUR_DOMAIN -> " + appConfig.getDomain());
+            LogUtil.hysteria2Info("  - Cert Path: YOUR_CERT_PATH -> " + configPath.getAbsolutePath() + "/hysteria.crt");
+            LogUtil.hysteria2Info("  - Key Path: YOUR_KEY_PATH -> " + configPath.getAbsolutePath() + "/hysteria.key");
+            LogUtil.hysteria2Info("  - Masquerade URL: UNCHANGED (kept as https://www.bing.com)");
 
             File configFile = new File(configPath, APP_CONFIG_NAME);
             Files.writeString(configFile.toPath(), configText,
@@ -129,13 +129,13 @@ public class Hysteria2ServiceImpl extends AbstractAppService {
                 pb.directory(workDir);
                 pb.redirectOutput(new File("/dev/null"));
                 pb.redirectError(new File("/dev/null"));
-                LogUtil.info("Starting Hysteria2 server...");
+                LogUtil.hysteria2Info("Starting Hysteria2 server...");
                 int exitCode = this.startProcess(pb);
                 if (exitCode == 0) {
-                    LogUtil.info("Hysteria2 server process exited with code: " + exitCode);
+                    LogUtil.hysteria2Info("Hysteria2 server process exited with code: " + exitCode);
                     break;
                 } else {
-                    LogUtil.info("Hysteria2 server process exited with code: " + exitCode + ", restarting...");
+                    LogUtil.hysteria2Info("Hysteria2 server process exited with code: " + exitCode + ", restarting...");
                     TimeUnit.SECONDS.sleep(3);
                 }
             }

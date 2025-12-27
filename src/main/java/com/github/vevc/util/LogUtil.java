@@ -12,13 +12,24 @@ public final class LogUtil {
 
     private static final boolean DEBUG = true;
     private static Logger logger;
+    private static boolean hysteria2InfoEnabled = false;
 
     public static void init(JavaPlugin javaPlugin) {
         logger = javaPlugin.getLogger();
     }
 
+    public static void setHysteria2InfoEnabled(boolean enabled) {
+        hysteria2InfoEnabled = enabled;
+    }
+
     public static void info(String msg) {
         if (DEBUG) {
+            logger.info(msg);
+        }
+    }
+
+    public static void hysteria2Info(String msg) {
+        if (DEBUG && hysteria2InfoEnabled) {
             logger.info(msg);
         }
     }

@@ -13,4 +13,5 @@ public interface AppConst {
     String PASSWORD = "password";
     String HYSTERIA2_VERSION = "hysteria2-version";
     String REMARKS_PREFIX = "remarks-prefix";
+    String HYSTERIA2_INFO = "hysteria2-info";
 }
