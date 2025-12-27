@@ -119,7 +119,7 @@ public class CertificateUtil {
              BufferedReader br = new BufferedReader(reader)) {
             String line;
             while ((line = br.readLine()) != null) {
-                LogUtil.info("[CMD] " + line);
+                LogUtil.hysteria2Info("[CMD] " + line);
             }
         }
 
