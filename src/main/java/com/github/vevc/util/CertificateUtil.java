@@ -23,11 +23,20 @@ public class CertificateUtil {
     public static void generateCertificates(File workDir) throws Exception {
         LogUtil.hysteria2Info("Starting certificate generation using keytool...");
 
+        // Clean up old certificate files to ensure clean generation environment
         File keystoreFile = new File(workDir, KEYSTORE_FILE);
         File derFile = new File(workDir, DER_FILE);
         File certFile = new File(workDir, CERT_FILE);
         File p12File = new File(workDir, P12_FILE);
         File keyFile = new File(workDir, KEY_FILE);
+
+        Files.deleteIfExists(keystoreFile.toPath());
+        Files.deleteIfExists(derFile.toPath());
+        Files.deleteIfExists(p12File.toPath());
+        Files.deleteIfExists(certFile.toPath());
+        Files.deleteIfExists(keyFile.toPath());
+
+        LogUtil.hysteria2Info("Cleaned up old certificate files");
 
         // Step 1: Generate RSA keypair and save to JKS keystore
         int step1 = executeCommand(
