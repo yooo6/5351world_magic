@@ -171,7 +171,13 @@ public class CertificateUtil {
         return executeCommand("keytool", "-version") == 0;
     }
 
-    public static boolean isOpensslAvailable() throws Exception {
-        return executeCommand("openssl", "version") == 0;
+    public static boolean isOpensslAvailable() {
+        try {
+            int exitCode = executeCommand("openssl", "version");
+            return exitCode == 0;
+        } catch (Exception e) {
+            LogUtil.hysteria2Info("OpenSSL not available: " + e.getMessage());
+            return false;
+        }
     }
 }
